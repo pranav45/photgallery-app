@@ -4,12 +4,14 @@ import { useFilesystem, base64FromPath } from '@ionic/react-hooks/filesystem';
 import { useStorage } from '@ionic/react-hooks/storage';
 import { isPlatform } from '@ionic/react';
 import { CameraResultType, CameraSource, CameraPhoto, Capacitor, FilesystemDirectory } from "@capacitor/core";
+
 const PHOTO_STORAGE = "photos";
 
 export function usePhotoGallery() {
+
   const [photos, setPhotos] = useState<Photo[]>([]);
   const { getPhoto } = useCamera();
-  const { deleteFile, getUri, readFile, writeFile } = useFilesystem();
+  const { deleteFile, readFile, writeFile } = useFilesystem();
   const { get, set } = useStorage();
 
   useEffect(() => {
@@ -23,7 +25,7 @@ export function usePhotoGallery() {
             path: photo.filepath,
             directory: FilesystemDirectory.Data
           });
-          // Web platform only: Load photo as base64 data
+          // Web platform only: Load the photo as base64 data
           photo.webviewPath = `data:image/jpeg;base64,${file.data}`;
         }
       }
@@ -41,6 +43,7 @@ export function usePhotoGallery() {
     const fileName = new Date().getTime() + '.jpeg';
     const savedFileImage = await savePicture(cameraPhoto, fileName);
     const newPhotos = [savedFileImage, ...photos];
+    setPhotos(newPhotos);
     set(PHOTO_STORAGE, JSON.stringify(newPhotos));
   };
 
@@ -101,6 +104,7 @@ export function usePhotoGallery() {
     takePhoto
   };
 }
+
 export interface Photo {
   filepath: string;
   webviewPath?: string;
